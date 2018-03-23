@@ -1,1 +1,1 @@
-# word2vec_undergrad_project
+# 딥러닝을 이용한 문서의 문자열 변형 발견 및 복원 프로그램 개발

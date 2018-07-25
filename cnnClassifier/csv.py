@@ -43,14 +43,18 @@ with open("./data/rt-polaritydata/text8", "r") as f:
             seq = list()
             k = i
             while len(seq) < window:
+                if k == len(orig_rev):
+                    seq.clear()
+                    break
                 if orig_rev[k] in wv.vocab:
                     seq.append(wv.vocab[orig_rev[k]].index)
                     k += 1
                 else:
                     k += 1
                     continue
-            label = seq[5]
-            data.append([seq, label])
+            if len(seq) == 11:
+                label = seq[5]
+                data.append([seq, label])
 
     df = pd.DataFrame(data, columns=["sequence", "label"])
     df.to_csv("./data/rt-polaritydata/data.csv", encoding="utf-8", index=False)

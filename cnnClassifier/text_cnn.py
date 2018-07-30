@@ -8,8 +8,7 @@ class TextCNN(object):
     Uses an embedding layer, followed by a convolutional, max-pooling and softmax layer.
     """
     def __init__(
-      self, sequence_length, num_classes, vocab_size,
-      embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0):
+      self, sequence_length, num_classes, embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0):
 
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
@@ -26,7 +25,7 @@ class TextCNN(object):
             # wv = model.wv
             # print(len(wv.vocab))
             # print(wv.vocab['rock'].index) # 학습시킨 단어를 vector파일에서 index를 확인할 수 있다.
-            self.W = tf.Variable(table, name="W")
+            self.W = tf.constant(table, name="W")
             self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
             self.embedded_chars_expanded = tf.expand_dims(self.embedded_chars, -1)
 

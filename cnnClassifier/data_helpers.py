@@ -111,7 +111,7 @@ def load_data_and_labels(positive_data_file):
     return [x_text, y]
 
 
-def batch_iter(data, batch_size, num_epochs, shuffle=False):
+def batch_iter(data, batch_size, num_epochs, shuffle=True):
     """
     Generates a batch iterator for a dataset.
     """
@@ -123,6 +123,7 @@ def batch_iter(data, batch_size, num_epochs, shuffle=False):
         if shuffle:
             shuffle_indices = np.random.permutation(np.arange(data_size))
             shuffled_data = data[shuffle_indices]
+            print(shuffled_data)
         else:
             shuffled_data = data
         for batch_num in range(num_batches_per_epoch):

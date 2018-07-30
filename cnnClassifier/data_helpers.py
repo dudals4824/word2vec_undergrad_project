@@ -1,5 +1,6 @@
 import numpy as np
 import re
+import pandas as pd
 import itertools
 from collections import Counter
 from gensim.models import Word2Vec
@@ -33,7 +34,23 @@ def load_data_and_labels(positive_data_file):
 
     model = Word2Vec.load("./data/rt-polaritydata/wvModel")
     wv = model.wv
+    print(len(wv.vocab))
+    df = pd.read_csv("./data/rt-polaritydata/data.csv")
+
+    x_text = list()
     y = list()
+    for row in df.itertuples(index=True):
+        seq = getattr(row, "sequence")
+        seq = clean_str(seq)
+        seq = seq.split(" , ")
+        x = list()
+        for i in seq:
+            x.append(int(i))
+
+        x_text.append(x)
+        y.append(getattr(row, "label"))
+
+
     # print(len(wv.vocab))
     # print(wv.vocab['the'].index)
 
@@ -44,49 +61,49 @@ def load_data_and_labels(positive_data_file):
     # else:
     #     print(-123456778iiㅑ)
 
-    revs = []
-    window = 11
-    with open(positive_data_file, "r") as f:
-        for line in f:
-            rev = []
-            rev.append(line.strip())
-            orig_rev = list(clean_str(" ".join(rev)).split())
-
-            for i in range(0, len(orig_rev)):
-                s = orig_rev[i:i + window]
-                idx = int(i + window / 2)
-                anslist = np.zeros(len(wv.vocab) + 1)
-                ans = None
-
-                if len(s) < window:
-                    continue
-                else:
-                    ans = orig_rev[idx]
-                    w = str()
-                    for k in range(0, len(s)):
-                        if k == len(s)-1:
-                            w = w + s[k]
-                        else:
-                            w = w + s[k] + " "
-                    # print(ans)
-                    revs.append(w)
-                    if ans in wv.vocab:
-                        anslist[wv.vocab[ans].index] = 1
-                        y.append(wv.vocab[ans].index)
-                        print(len(y))
-                    else:
-                        anslist[len(wv.vocab)] = 1
-                        y.append(len(wv.vocab))
-                        print(len(y))
-
-
-    # Load data from files
-    # positive_examples = list(open(positive_data_file, "r", encoding='utf-8').readlines())
-    # positive_examples = [s.strip() for s in positive_examples]
-    # negative_examples = list(open(negative_data_file, "r", encoding='utf-8').readlines())
-    # negative_examples = [s.strip() for s in negative_examples]
-    # Split by words
-    x_text = revs
+    # revs = []
+    # window = 11
+    # with open(positive_data_file, "r") as f:
+    #     for line in f:
+    #         rev = []
+    #         rev.append(line.strip())
+    #         orig_rev = list(clean_str(" ".join(rev)).split())
+    #
+    #         for i in range(0, len(orig_rev)):
+    #             s = orig_rev[i:i + window]
+    #             idx = int(i + window / 2)
+    #             anslist = np.zeros(len(wv.vocab) + 1)
+    #             ans = None
+    #
+    #             if len(s) < window:
+    #                 continue
+    #             else:
+    #                 ans = orig_rev[idx]
+    #                 w = str()
+    #                 for k in range(0, len(s)):
+    #                     if k == len(s)-1:
+    #                         w = w + s[k]
+    #                     else:
+    #                         w = w + s[k] + " "
+    #                 # print(ans)
+    #                 revs.append(w)
+    #                 if ans in wv.vocab:
+    #                     anslist[wv.vocab[ans].index] = 1
+    #                     y.append(wv.vocab[ans].index)
+    #                     print(len(y))
+    #                 else:
+    #                     anslist[len(wv.vocab)] = 1
+    #                     y.append(len(wv.vocab))
+    #                     print(len(y))
+    #
+    #
+    # # Load data from files
+    # # positive_examples = list(open(positive_data_file, "r", encoding='utf-8').readlines())
+    # # positive_examples = [s.strip() for s in positive_examples]
+    # # negative_examples = list(open(negative_data_file, "r", encoding='utf-8').readlines())
+    # # negative_examples = [s.strip() for s in negative_examples]
+    # # Split by words
+    # x_text = revs
     # x_text = [clean_str(sent) for sent in x_text]
     # Generate labels
     # _는 문장 하나를 뜻함.
@@ -94,7 +111,7 @@ def load_data_and_labels(positive_data_file):
     return [x_text, y]
 
 
-def batch_iter(data, batch_size, num_epochs, shuffle=True):
+def batch_iter(data, batch_size, num_epochs, shuffle=False):
     """
     Generates a batch iterator for a dataset.
     """

@@ -28,13 +28,14 @@ wv = model.wv
 
 window = 11
 
-data = []
+traindata = []
+testdata = []
 with open("./text8", "r") as f:
     for line in f:
         rev = []
         rev.append(line.strip())
         orig_rev = list(clean_str(" ".join(rev)).split())
-
+        datanum = 1
         for i in range(0, len(orig_rev)):
             print("진행중...")
             seq = ""
@@ -51,7 +52,12 @@ with open("./text8", "r") as f:
                     num += 1
                 k += 1
 
-            data.append([seq, label])
+            if datanum % 10 == 0:
+                testdata.append([seq, label])
+            else:
+                traindata.append([seq, label])
 
-    df = pd.DataFrame(data, columns=["sequence", "label"])
-    df.to_csv("./data.csv", encoding="utf-8", index=False)
+    traindf = pd.DataFrame(traindata, columns=["sequence", "label"])
+    testdf = pd.DataFrame(testdata, columns=["sequence", "label"])
+    traindf.to_csv("./train.csv", encoding="utf-8", index=False)
+    testdf.to_csv("./test.csv", encoding="utf-8", index=False)

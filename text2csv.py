@@ -12,7 +12,7 @@ train_data = []
 valid_data = []
 test_data = []
 
-f = open("./text8/test_text8", "r")
+f = open("./text8/new_text8", "r")
 orig_rev = f.readline().split(" ")
 
 # frequency table : S

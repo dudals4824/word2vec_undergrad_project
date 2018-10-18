@@ -5,11 +5,13 @@ from gensim.models import Word2Vec
 import pandas as pd
 import random
 import math
+import os
 
-model = Word2Vec.load("./data/subsampled_wvModel")
+model = Word2Vec.load("./data/50kwvModel")
 wv = model.wv
+CHECK_POINT_DIR = './rnn_runs/checkpoint'
 learning_rate = 0.001
-epoch_num = 201
+epoch_num = 151
 cell_num = 512
 sequence_len = 10
 word_num = 47915 #47915
@@ -82,7 +84,6 @@ def train(_traindf, _dic):
         x_batch, y_batch, start_idx = next_batch(_traindf, _dic, start_idx)
         if len(x_batch) == batch_size:
             train_step += 1
-            print(train_step)
         elif len(x_batch) < batch_size:
             break
         feed_dict = {X: x_batch, Y: y_batch}
@@ -143,6 +144,11 @@ def run():
                                     valid_loss_tensorboard: valid_loss})
         writer.add_summary(summary, epoch)
 
+        print("Saving network...")
+        if not os.path.exists(CHECK_POINT_DIR):
+            os.makedirs(CHECK_POINT_DIR)
+        saver.save(sess, CHECK_POINT_DIR, global_step=epoch)
+
 with tf.device('/cpu:0'):
     X = tf.placeholder(tf.int32, [None, sequence_len])
     Y = tf.placeholder(tf.int32, [None, word_num])
@@ -179,6 +185,8 @@ with tf.device('/cpu:0'):
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
+saver = tf.train.Saver()
+
 train_accuracy_tensorboard = tf.placeholder(tf.float32)
 train_loss_tensorboard = tf.placeholder(tf.float32)
 valid_accuracy_tensorboard = tf.placeholder(tf.float32)
@@ -193,4 +201,3 @@ writer = tf.summary.FileWriter('./rnn_runs/', sess.graph)
 
 # run
 run()
-
